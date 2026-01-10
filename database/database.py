@@ -5,7 +5,7 @@ def append_db(user_id) -> None:
     '''Эта функция добавляет пользователя в базу данных, если его там нет'''
     user_id = str(user_id)
     
-    file = open("C:\\Users\\Lena\\Desktop\\github proects\\book_bot\\database\\SQL.json", "r+")
+    file = open("C:\\Users\\Lena\\Desktop\\github proects\\book_bot\\database\\SQL.json", "r+", encoding="utf-8")
     data = json.load(file)
     if checking_db(user_id, data):
         file.close()
@@ -49,6 +49,6 @@ def append_path(user_id, path):
 
 def anti_acess(user_id):
     'До создания антивируса функция блокирует пользователей с чужим id'
-    if user_id != "6027578907" and user_id != "1898019149":
+    if user_id != "6027578907" and user_id != "1898019149" and user_id != "5215143463":
        raise ValueError(f"Несанкционированный доступ: id = {user_id}")
 

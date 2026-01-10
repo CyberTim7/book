@@ -39,7 +39,7 @@ async def processed_file(message:Message):
             append_path(user_id, book_path)
             return book_path
         else:
-            return False
+            await message.answer(lexicon_RU["error_format"])
 
 
 def pdf_file(path):
@@ -64,6 +64,22 @@ def save_book(path_origin, book):
     return new_file_path
 
 
+async def SQL_NOW(message:Message, book_path):
+    with open("C:\\Users\\Lena\\Desktop\\github proects\\book_bot\\database\\SQL_NOW.json", "r+", encoding="utf-8") as file:
+        data = json.load(file)
+        data[message.from_user.id] = book_path
+        file.seek(0)
+        json.dump(data, file, indent=2, ensure_ascii=False)
 
+async def get_path_book(callback:CallbackQuery):
+    with open("C:\\Users\\Lena\\Desktop\\github proects\\book_bot\\database\\SQL_NOW.json", "r+", encoding="utf-8") as file:
+        data = json.load(file)
+        try:
+            book_path = data[str(callback.from_user.id)]
+            return book_path
+        except KeyError:
+            await callback.message.edit_text(lexicon_RU["error_callback"])
+            
+    
 
     

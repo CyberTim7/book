@@ -207,6 +207,9 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Other
 SQL.json
 users_books/
 tests/
+SQL_NOW.json
