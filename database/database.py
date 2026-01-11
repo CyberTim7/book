@@ -1,8 +1,8 @@
 import json
-
+import os
 
 def append_db(user_id) -> None:
-    '''Эта функция добавляет пользователя в базу данных, если его там нет'''
+    '''Эта функция добавляет пользователя в базу данных, если его там нет а также создает персональную папку для него'''
     user_id = str(user_id)
     
     file = open("C:\\Users\\Lena\\Desktop\\github proects\\book_bot\\database\\SQL.json", "r+", encoding="utf-8")
@@ -15,6 +15,8 @@ def append_db(user_id) -> None:
         file.seek(0)
         json.dump(data, file, indent=2)
         file.close()
+        os.chdir("C:\\Users\\Lena\\Desktop\\github proects\\book_bot\\database\\users_books")
+        os.mkdir(user_id)
         
 
 
@@ -26,10 +28,11 @@ def checking_db(user_id, base_data) -> bool:
         return False
 
 def init_db() -> dict:
-    '''Возвращает базовый словарь нового пользователя'''
+    '''Возвращает пустой словарь нового пользователя'''
     return {}
         
 def append_path(user_id, path):
+    '''Создает базовый словарь пользователя хотя бы с одной книгой'''
     file = open("C:\\Users\\Lena\\Desktop\\github proects\\book_bot\\database\\SQL.json", "r+", encoding="utf-8")
     data = json.load(file)
     data[str(user_id)][path.split('\\')[-1]] = {"path_book" : "", "page" : 1, "bookmarks" : []}

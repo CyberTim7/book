@@ -1,6 +1,7 @@
 from aiogram import Bot, Dispatcher
 from configs.config import load_config
 from handlers.user import user_router
+from setcommands import setcommands
 import os
 import asyncio
 
@@ -19,7 +20,8 @@ dp.include_router(user_router)
 async def main():
     print('Начинаю опрос сервера')
     try:
-        await asyncio.wait_for(dp.start_polling(bot), timeout=1000)
+        dp.startup.register(setcommands)
+        await asyncio.wait_for(dp.start_polling(bot), timeout=200)
     
     except TimeoutError:
         print('Опрос сервера завершен')

@@ -12,7 +12,7 @@ async def download_file(message:Message) -> str:
     file = await message.bot.get_file(file_id)
     download_file = await message.bot.download_file(file.file_path)
     file_name = message.document.file_name
-    file_path_new = f"C:\\Users\\Lena\\Desktop\\github proects\\book_bot\\database\\users_books\\{file_name}"
+    file_path_new = f"C:\\Users\\Lena\\Desktop\\github proects\\book_bot\\database\\users_books\\{message.from_user.id}\\{file_name}"
     result_file = open(file_path_new, "wb")
     result_file.write(download_file.read())
     result_file.close()
@@ -64,12 +64,31 @@ def save_book(path_origin, book):
     return new_file_path
 
 
-async def SQL_NOW(message:Message, book_path):
+async def SQL_NOW(data_user:Message|CallbackQuery, book_path):
     with open("C:\\Users\\Lena\\Desktop\\github proects\\book_bot\\database\\SQL_NOW.json", "r+", encoding="utf-8") as file:
         data = json.load(file)
-        data[message.from_user.id] = book_path
-        file.seek(0)
-        json.dump(data, file, indent=2, ensure_ascii=False)
+        for key in data.keys():
+            if data_user.from_user.id == key:
+                break
+        else:
+            data[data_user.from_user.id] = book_path
+            file.seek(0)
+            json.dump(data, file, indent=2, ensure_ascii=False)
+
+
+
+
+def SQL_NOW_DEL(message:Message):
+    with open("C:\\Users\\Lena\\Desktop\\github proects\\book_bot\\database\\SQL_NOW.json", "r+", encoding="utf-8") as file:
+        data = json.load(file)
+        try:
+            del data[str(message.from_user.id)]
+            file.seek(0)
+            file.truncate()
+            file.write(json.dumps(data, ensure_ascii=False))
+        except KeyError:
+            pass
+    
 
 async def get_path_book(callback:CallbackQuery):
     with open("C:\\Users\\Lena\\Desktop\\github proects\\book_bot\\database\\SQL_NOW.json", "r+", encoding="utf-8") as file:
