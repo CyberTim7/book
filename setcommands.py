@@ -7,7 +7,9 @@ async def setcommands(bot):
         BotCommand(command="/help",
                    description="Список доступных команд"),
         BotCommand(command="/my_books",
-                   description="Список ваших книг")]
+                   description="Список ваших книг"),
+        BotCommand(command="/delete_my_book",
+                   description="Удаляет выбранную книгу")]
 
                
     await bot.set_my_commands(commands)

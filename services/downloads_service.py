@@ -3,6 +3,7 @@ from services.main_service import get_book
 from database.database import append_path
 import PyPDF2
 import json
+from database.database_init import connect, cursor, config
 
 
 async def download_file(message:Message) -> str:
@@ -40,9 +41,11 @@ async def processed_file(message:Message):
             return book_path
         else:
             await message.answer(lexicon_RU["error_format"])
+        
 
 
 def pdf_file(path):
+    '''Извлекает текст из pdf'''
     with open(path, 'rb') as file:
         reader = PyPDF2.PdfReader(file)
         text = ""
@@ -51,6 +54,7 @@ def pdf_file(path):
     return text
 
 def save_book(path_origin, book):
+    '''Сохраняет книгу в json'''
     index = path_origin.rfind(".")
     new_file_path = path_origin[:index + 1] + "json"
     for keys in book:
@@ -65,39 +69,39 @@ def save_book(path_origin, book):
 
 
 async def SQL_NOW(data_user:Message|CallbackQuery, book_path):
-    with open("C:\\Users\\Lena\\Desktop\\github proects\\book_bot\\database\\SQL_NOW.json", "r+", encoding="utf-8") as file:
-        data = json.load(file)
-        for key in data.keys():
-            if data_user.from_user.id == key:
-                break
-        else:
-            data[data_user.from_user.id] = book_path
-            file.seek(0)
-            json.dump(data, file, indent=2, ensure_ascii=False)
+    '''Вставляет данные во временную таблицу sql_now'''
+    sql_select = """INSERT INTO sql_now (user_id, book_path)
+                   VALUES(%s, %s)"""
+    if str(type(data_user)) == "<class 'aiogram.types.message.Message'>":
+        user_id = data_user.from_user.id
+    elif str(type(data_user)) == "<class 'aiogram.types.callback_query.CallbackQuery'>":
+        user_id = data_user.from_user.id
+    cursor.execute(sql_select, (user_id, book_path))
+    connect.commit()
 
 
 
 
 def SQL_NOW_DEL(message:Message):
-    with open("C:\\Users\\Lena\\Desktop\\github proects\\book_bot\\database\\SQL_NOW.json", "r+", encoding="utf-8") as file:
-        data = json.load(file)
-        try:
-            del data[str(message.from_user.id)]
-            file.seek(0)
-            file.truncate()
-            file.write(json.dumps(data, ensure_ascii=False))
-        except KeyError:
-            pass
+    '''Удаляет пользователя из временной таблицы sql_now'''
+    sql_select = """DELETE FROM sql_now WHERE user_id = %s"""
+    cursor.execute(sql_select, (message.from_user.id,))
     
 
 async def get_path_book(callback:CallbackQuery):
-    with open("C:\\Users\\Lena\\Desktop\\github proects\\book_bot\\database\\SQL_NOW.json", "r+", encoding="utf-8") as file:
-        data = json.load(file)
+    '''Получает путь к книге пользователя'''
+    sql_select = """SELECT book_path FROM sql_now WHERE user_id = %s"""
+    try:
+        cursor.execute(sql_select, (callback.from_user.id,))
         try:
-            book_path = data[str(callback.from_user.id)]
+            book_path = cursor.fetchone()[0]
             return book_path
-        except KeyError:
-            await callback.message.edit_text(lexicon_RU["error_callback"])
+        except TypeError:
+            return False
+    except mysql.connector.errors.InternalError:
+        return False
+    
+
             
     
 

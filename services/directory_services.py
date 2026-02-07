@@ -9,5 +9,8 @@ def checking_books(user_id):
     for books in user_books:
         if books.split(".")[-1] != "json":
             real_books.append(books)
-    keyboard1 = main_builder(real_books, user_id)
-    return keyboard1
+    if real_books == []:
+        return False
+    else:
+        keyboard1 = main_builder(real_books, user_id, code="1")
+        return keyboard1

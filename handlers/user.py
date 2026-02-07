@@ -7,7 +7,7 @@ from services.downloads_service import processed_file, SQL_NOW, SQL_NOW_DEL, get
 from services.user_services import open_file, next_click, down_click, get_path_book_then, get_page
 from keyboards.keyboards import keyboard_yes_no, keyboard_book
 from services.directory_services import checking_books
-from filters.filters import filter_code1
+from filters.filters import filter_code1, filter_code2
 import asyncio
 
 
@@ -37,10 +37,13 @@ async def doc_answer(message:Message):
 @user_router.callback_query(F.data == "button_yes_click")
 async def answer_yes(callback:CallbackQuery): 
     async with lock: 
+        await callback.answer(lexicon_RU["loading"]) 
         book_path = await get_path_book(callback)
         if book_path:
-            await callback.answer(lexicon_RU["loading"]) 
             await open_file(book_path, callback)
+        else:
+            await callback.message.edit_text(lexicon_RU["error_callback"])
+
         
             
 @user_router.callback_query(F.data == "button_next_click")
@@ -50,6 +53,8 @@ async def next_page(callback:CallbackQuery):
         book_path = await get_path_book(callback)  
         if book_path:  
             await next_click(book_path, callback)
+        else:
+            await callback.message.edit_text(lexicon_RU["error_callback"])
 
 @user_router.callback_query(F.data == "button_down_click")
 async def down_page(callback:CallbackQuery):
@@ -58,6 +63,8 @@ async def down_page(callback:CallbackQuery):
         book_path = await get_path_book(callback)
         if book_path:   
             await down_click(book_path, callback)
+        else:
+            await callback.message.edit_text(lexicon_RU["error_callback"])
         
 @user_router.callback_query(F.data == "button_no_click")
 async def answer_no(callback:CallbackQuery):
@@ -69,8 +76,13 @@ async def answer_no(callback:CallbackQuery):
 async def book_list(message:Message):
     async with lock:
         user_books_keyboard = checking_books(str(message.from_user.id))
-        await message.answer(lexicon_RU["your_books"], reply_markup=user_books_keyboard)
-        SQL_NOW_DEL(message)
+        if user_books_keyboard:
+            SQL_NOW_DEL(message)
+            await message.answer(lexicon_RU["your_books"], reply_markup=user_books_keyboard)
+        else:
+            await message.answer(lexicon_RU["you_havent_books"])
+
+            
 
 
 
@@ -79,28 +91,22 @@ async def print_book(callback:CallbackQuery):
     async with lock:
         await callback.answer(lexicon_RU["loading"])
         book_path = get_path_book_then(callback)
-        page_real = get_page(callback)   
-        await open_file(book_path, callback, page=page_real)
-        await SQL_NOW(callback, book_path)
+        if book_path:
+            page_real = get_page(callback)   
+            await open_file(book_path, callback, page=page_real)
+            await SQL_NOW(callback, book_path)
+        else:
+            await callback.message.edit_text(lexicon_RU["no_file"])
 
-        
-        
+@user_router.message(Command(commands="delete_my_book"))
+async def book_list_copy(message:Message):
+    async with lock:
+        user_books_keyboard = checking_books(str(message.from_user.id))
+        if user_books_keyboard:
+            SQL_NOW_DEL(message)
+            await message.answer(lexicon_RU["change_your_books"], reply_markup=user_books_keyboard)
+        else:
+            await message.answer(lexicon_RU["you_havent_books"])
 
-        
-
-    
-
-
-   
-
-
-
-    
-
-
-
-
-    
-    
 
         
