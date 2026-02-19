@@ -3,7 +3,7 @@ from services.main_service import get_book
 from database.database import append_path
 import PyPDF2
 import json
-from database.database_init import connect, cursor, config
+from database.database_init import create_connect, terminate_connect
 
 
 async def download_file(message:Message) -> str:
@@ -69,6 +69,7 @@ def save_book(path_origin, book):
 
 
 async def SQL_NOW(data_user:Message|CallbackQuery, book_path):
+    connect, cursor = create_connect()
     '''Вставляет данные во временную таблицу sql_now'''
     sql_select = """INSERT INTO sql_now (user_id, book_path)
                    VALUES(%s, %s)"""
@@ -78,18 +79,23 @@ async def SQL_NOW(data_user:Message|CallbackQuery, book_path):
         user_id = data_user.from_user.id
     cursor.execute(sql_select, (user_id, book_path))
     connect.commit()
+    terminate_connect(connect)
 
 
 
 
 def SQL_NOW_DEL(message:Message):
     '''Удаляет пользователя из временной таблицы sql_now'''
+    connect, cursor = create_connect()
     sql_select = """DELETE FROM sql_now WHERE user_id = %s"""
     cursor.execute(sql_select, (message.from_user.id,))
+    connect.commit()
+    terminate_connect(connect)
     
 
 async def get_path_book(callback:CallbackQuery):
     '''Получает путь к книге пользователя'''
+    connect, cursor = create_connect()
     sql_select = """SELECT book_path FROM sql_now WHERE user_id = %s"""
     try:
         cursor.execute(sql_select, (callback.from_user.id,))
@@ -100,6 +106,7 @@ async def get_path_book(callback:CallbackQuery):
             return False
     except mysql.connector.errors.InternalError:
         return False
+    terminate_connect(connect)
     
 
             

@@ -1,20 +1,16 @@
 import json
 import os
-import mysql.connector
+from database.database_init import create_connect, terminate_connect
 from configs.config import load_config
+import mysql.connector
 
 
-config = load_config(path="C:\\Users\\Lena\\Desktop\\github proects\\book_bot\\configs\\.env")
-connect = mysql.connector.connect(user=config.database.admin,
-                          password=config.database.password,
-                          host=config.database.host,
-                          database=config.database.database)
 
-cursor = connect.cursor()
 
 
 def append_db(user_id) -> None:
     '''Эта функция добавляет пользователя в базу данных, если его там нет а также создает персональную папку для него'''
+    connect, cursor = create_connect()
     try:
         anti_acess(user_id) 
         cursor.execute("INSERT INTO user"
@@ -27,9 +23,11 @@ def append_db(user_id) -> None:
     
     except mysql.connector.errors.IntegrityError:
         pass
+    terminate_connect(connect)
     
 
 def append_path(user_id, path):
+    connect, cursor = create_connect()
     '''Создает базовый словарь пользователя хотя бы с одной книгой'''
     index_end = path.rfind(".")
     index_st = path.rfind("\\") + 1
@@ -47,11 +45,12 @@ def append_path(user_id, path):
         connect.commit()
     except mysql.connector.errors.IntegrityError:
         pass
+    terminate_connect(connect)
     
     
 
 def anti_acess(user_id):
     'До создания антивируса функция блокирует пользователей с чужим id'
-    if user_id != 6027578907 and user_id != 1898019149 and user_id != 5215143463:
+    if user_id != 6027578907 and user_id != 1898019149 and user_id != 5215143463 and user_id != 5261145862:
        raise ValueError(f"Несанкционированный доступ: id = {user_id}")
 
