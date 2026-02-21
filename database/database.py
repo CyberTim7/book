@@ -12,7 +12,6 @@ def append_db(user_id) -> None:
     '''Эта функция добавляет пользователя в базу данных, если его там нет а также создает персональную папку для него'''
     connect, cursor = create_connect()
     try:
-        anti_acess(user_id) 
         cursor.execute("INSERT INTO user"
                        "(user_id)"
                        "VALUES ({});".format(user_id))
@@ -49,8 +48,5 @@ def append_path(user_id, path):
     
     
 
-def anti_acess(user_id):
-    'До создания антивируса функция блокирует пользователей с чужим id'
-    if user_id != 6027578907 and user_id != 1898019149 and user_id != 5215143463 and user_id != 5261145862:
-       raise ValueError(f"Несанкционированный доступ: id = {user_id}")
 
+    

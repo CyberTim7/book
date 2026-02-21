@@ -6,6 +6,7 @@ from dataclasses import dataclass
 class Config:
     Bot:Tgbot
     database:MySql
+    admin_lst:Admin
 
 
 @dataclass
@@ -20,6 +21,10 @@ class MySql:
     host:str
     database:str
 
+@dataclass
+class Admin:
+    admins:set
+
 
 def load_config(path:str) -> Config:
     env = Env()
@@ -28,7 +33,8 @@ def load_config(path:str) -> Config:
                   database=MySql(password=env("password"),
                                  admin=env("admin"),
                                  host=env("host"),
-                                 database=env("database")))
+                                 database=env("database")),
+                  admin_lst=Admin(admins=env("admins")))
 
 
     

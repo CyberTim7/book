@@ -6,9 +6,9 @@ from database.database_init import create_connect, terminate_connect
 from aiogram.exceptions import TelegramBadRequest
 
 
-async def open_file(book_path, callback:CallbackQuery, page="1"):
+async def open_file(book_path:str, book_id:int, callback:CallbackQuery, page="1"):
     '''Отправляет пользователю страницу книги'''
-    keyboard_book = button_next_down(book_path)
+    keyboard_book = button_next_down(book_id)
     with open(book_path, "r+", errors='replace', encoding="utf-8") as file:
         book = json.load(file)
         key = book.get(page)
@@ -22,14 +22,12 @@ async def open_file(book_path, callback:CallbackQuery, page="1"):
 
 
 
-async def next_click(book_path, callback:CallbackQuery):
+async def next_click(book_id, book_path, callback:CallbackQuery):
     '''Обрабатывает нажатие кнопки следующей страницы'''
     
-    
     connect, cursor = create_connect()
-    keyboard_book = button_next_down(book_path)
+    keyboard_book = button_next_down(book_id)
     book_path = book_path.replace("\\", "/")
-    print(book_path)
     user_id = callback.from_user.id
     with open(book_path, "r", encoding="utf-8") as file:
         book = json.load(file)  
@@ -58,10 +56,10 @@ async def next_click(book_path, callback:CallbackQuery):
     
         
 
-async def down_click(book_path, callback:CallbackQuery):
+async def down_click(book_id, book_path, callback:CallbackQuery):
     '''Обрабатывает нажатие кнопки предыдущей страницы'''
     connect, cursor = create_connect()
-    keyboard_book = button_next_down(book_path)
+    keyboard_book = button_next_down(book_id)
     book_path = book_path.replace("\\", "/")
     user_id = callback.from_user.id
     with open(book_path, "r", encoding="utf-8") as file:

@@ -10,7 +10,7 @@ from services.user_services import open_file, next_click, down_click, get_path_b
 from keyboards.keyboards import keyboard_yes_no, button_next_down
 from services.directory_services import checking_books, delete_user_book
 from filters.filters import filter_code1, filter_code2, filter_button_yes, filter_button_next, filter_button_down
-from services.database_services import delete_book_from_sql
+from services.database_services import delete_book_from_sql, get_book_id, get_book_path_from_book
 import asyncio
 import logging
 
@@ -32,7 +32,8 @@ async def help_command(message:Message):
 async def doc_answer(message:Message, state:FSMContext):
     SQL_NOW_DEL(message)
     book_path = await processed_file(message)
-    my_keyboard_yes_no = keyboard_yes_no(book_path)
+    book_id = get_book_id(book_path, message)
+    my_keyboard_yes_no = keyboard_yes_no(str(book_id))
     if book_path:
         await message.answer(lexicon_RU["processed"], reply_markup=my_keyboard_yes_no)
         await SQL_NOW(message, book_path)
@@ -42,10 +43,10 @@ async def doc_answer(message:Message, state:FSMContext):
 @user_router.callback_query(filter_button_yes())
 async def answer_yes(callback:CallbackQuery, state:FSMContext): 
     await callback.answer(lexicon_RU["loading"]) 
-    book_name = str(callback.data)[17:]
-    book_path = f'C:\\Users\\Lena\\Desktop\\github proects\\book_bot\\database\\users_books\\{callback.from_user.id}\\'+ book_name
+    book_id = str(callback.data)[17:]
+    book_path = get_book_path_from_book(book_id)
     if book_path:
-        await open_file(book_path, callback)
+        await open_file(book_path, book_id, callback)
     else:
         await callback.message.edit_text(lexicon_RU["error_callback"])
 
@@ -54,12 +55,10 @@ async def answer_yes(callback:CallbackQuery, state:FSMContext):
 @user_router.callback_query(filter_button_next())
 async def next_page(callback:CallbackQuery, state:FSMContext):
     await callback.answer(lexicon_RU["loading"])
-    book_name = str(callback.data)[18:]
-    print(book_name)
-    book_path = f'C:\\Users\\Lena\\Desktop\\github proects\\book_bot\\database\\users_books\\{callback.from_user.id}\\'+ book_name
+    book_id = str(callback.data)[18:]
+    book_path = get_book_path_from_book(book_id)
     if book_path:  
-        print(callback.data)
-        await next_click(book_path, callback)
+        await next_click(book_id, book_path, callback)
     else:
         await callback.message.edit_text(lexicon_RU["error_callback"])
 
@@ -67,10 +66,10 @@ async def next_page(callback:CallbackQuery, state:FSMContext):
 @user_router.callback_query(filter_button_down())
 async def down_page(callback:CallbackQuery, state:FSMContext):
     await callback.answer(lexicon_RU["loading"])
-    book_name = str(callback.data)[18:]
-    book_path = f'C:\\Users\\Lena\\Desktop\\github proects\\book_bot\\database\\users_books\\{callback.from_user.id}\\'+ book_name
+    book_id = str(callback.data)[18:]
+    book_path = get_book_path_from_book(book_id)
     if book_path:   
-        await down_click(book_path, callback)
+        await down_click(book_id, book_path, callback)
     else:
         await callback.message.edit_text(lexicon_RU["error_callback"])
         
