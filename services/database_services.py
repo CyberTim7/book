@@ -1,7 +1,8 @@
 from database.database_init import create_connect, terminate_connect
 import os
+from aiogram.types import Message, CallbackQuery
 
-def delete_book_from_sql(callback):
+def delete_book_from_sql(callback:CallbackQuery):
     connect, cursor = create_connect()
     sql_select = '''DELETE FROM book WHERE user_id = %s and path = %s'''
     user_id = callback.from_user.id

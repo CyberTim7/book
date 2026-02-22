@@ -5,6 +5,7 @@ import PyPDF2
 import json
 from database.database_init import create_connect, terminate_connect
 import os
+from aiogram.types import Message, CallbackQuery
 
 
 async def download_file(message:Message) -> str:
@@ -69,30 +70,7 @@ def save_book(path_origin, book):
     return new_file_path
 
 
-async def SQL_NOW(data_user:Message|CallbackQuery, book_path):
-    connect, cursor = create_connect()
-    '''Вставляет данные во временную таблицу sql_now'''
-    sql_select = """INSERT INTO sql_now (user_id, book_path)
-                   VALUES(%s, %s)"""
-    if str(type(data_user)) == "<class 'aiogram.types.message.Message'>":
-        user_id = data_user.from_user.id
-    elif str(type(data_user)) == "<class 'aiogram.types.callback_query.CallbackQuery'>":
-        user_id = data_user.from_user.id
-    cursor.execute(sql_select, (user_id, book_path))
-    connect.commit()
-    terminate_connect(connect)
 
-
-
-
-def SQL_NOW_DEL(message:Message):
-    '''Удаляет пользователя из временной таблицы sql_now'''
-    connect, cursor = create_connect()
-    sql_select = """DELETE FROM sql_now WHERE user_id = %s"""
-    cursor.execute(sql_select, (message.from_user.id,))
-    connect.commit()
-    terminate_connect(connect)
-    
 
 async def get_path_book(callback:CallbackQuery):
     '''Получает путь к книге пользователя'''

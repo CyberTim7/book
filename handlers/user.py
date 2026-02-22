@@ -5,7 +5,7 @@ from aiogram.fsm.state import default_state, State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from lexicons.lexicon_RU import lexicon_RU
 from database.database import append_db
-from services.downloads_service import processed_file, SQL_NOW, SQL_NOW_DEL, get_path_book
+from services.downloads_service import processed_file, get_path_book
 from services.user_services import open_file, next_click, down_click, get_path_book_then, get_page
 from keyboards.keyboards import keyboard_yes_no, button_next_down
 from services.directory_services import checking_books, delete_user_book
@@ -30,13 +30,11 @@ async def help_command(message:Message):
 
 @user_router.message(F.content_type == ContentType.DOCUMENT)
 async def doc_answer(message:Message, state:FSMContext):
-    SQL_NOW_DEL(message)
     book_path = await processed_file(message)
     book_id = get_book_id(book_path, message)
     my_keyboard_yes_no = keyboard_yes_no(str(book_id))
     if book_path:
         await message.answer(lexicon_RU["processed"], reply_markup=my_keyboard_yes_no)
-        await SQL_NOW(message, book_path)
         
 
 
@@ -83,7 +81,6 @@ async def answer_no(callback:CallbackQuery):
 async def book_list(message:Message, state:FSMContext):
     user_books_keyboard = checking_books(str(message.from_user.id), code="1")
     if user_books_keyboard:
-        SQL_NOW_DEL(message)
         await message.answer(lexicon_RU["your_books"], reply_markup=user_books_keyboard)
     else:
         await message.answer(lexicon_RU["you_havent_books"])
@@ -96,7 +93,6 @@ async def print_book(callback:CallbackQuery, state:FSMContext):
     if book_path:
         page_real = get_page(callback)   
         await open_file(book_path, callback, page=page_real)
-        await SQL_NOW(callback, book_path)
     else:
         await callback.message.edit_text(lexicon_RU["no_file"])
 
@@ -104,7 +100,6 @@ async def print_book(callback:CallbackQuery, state:FSMContext):
 async def book_list_copy(message:Message, state:FSMContext):
     user_books_keyboard = checking_books(str(message.from_user.id), code="2")
     if user_books_keyboard:
-        SQL_NOW_DEL(message)
         await message.answer(lexicon_RU["change_your_books"], reply_markup=user_books_keyboard)
     else:
         await message.answer(lexicon_RU["you_havent_books"])

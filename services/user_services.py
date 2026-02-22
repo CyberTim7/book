@@ -4,6 +4,7 @@ from lexicons.lexicon_RU import lexicon_RU
 import os
 from database.database_init import create_connect, terminate_connect
 from aiogram.exceptions import TelegramBadRequest
+from aiogram.types import Message, CallbackQuery
 
 
 async def open_file(book_path:str, book_id:int, callback:CallbackQuery, page="1"):

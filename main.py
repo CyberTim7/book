@@ -28,6 +28,10 @@ dp.message.outer_middleware(Middleware_for_acess())
 dp.include_router(user_router)
 connect, cursor = create_connect()
 
+
+
+
+
 async def main():
     logger.warning("Start polling...")
     try:

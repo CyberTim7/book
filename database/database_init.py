@@ -21,6 +21,12 @@ def terminate_connect(connect):
 
 def init_database():
     connect, cursor = create_connect()
-    cursor.execute("DELETE FROM sql_now;")
+    cursor.execute("CREATE TABLE IF NOT EXISTS user (user_id BIGINT NOT NULL UNIQUE)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS book (book_id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,"
+                                                     "user_id BIGINT NOT NULL UNIQUE, FOREIGN KEY (user_id) REFERENCES user(user_id),"
+                                                     "path VARCHAR(200) UNIQUE NOT NULL,"
+                                                     "page INT)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS user_access (user_id BIGINT NOT NULL,"
+                                                           "full_name VARCHAR(100))")
     connect.commit()
     terminate_connect(connect)

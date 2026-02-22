@@ -3,13 +3,6 @@ from dataclasses import dataclass
 
 
 @dataclass
-class Config:
-    Bot:Tgbot
-    database:MySql
-    admin_lst:Admin
-
-
-@dataclass
 class Tgbot:
     Bot_token:str
 
@@ -24,6 +17,12 @@ class MySql:
 @dataclass
 class Admin:
     admins:set
+
+@dataclass
+class Config:
+    Bot:Tgbot
+    database:MySql
+    admin_lst:Admin
 
 
 def load_config(path:str) -> Config:
