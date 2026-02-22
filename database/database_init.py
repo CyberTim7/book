@@ -1,7 +1,10 @@
 import mysql.connector
 from configs.config import load_config
+import os
 
-config = load_config(path="C:\\Users\\Lena\\Desktop\\github proects\\book_bot\\configs\\.env")
+
+path_config = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "\\configs\\.env"
+config = load_config(path_config)
 
 
 def create_connect():

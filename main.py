@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 logging.basicConfig(
     level=logging.DEBUG,
-    format='%(asctime)s - %(levelname)s - %(message)s in module %(module)s in line %(lineno)d'
+    format='%(asctime)s - %(levelname)s - %(message)s module %(module)s line %(lineno)d'
 )
 logging.getLogger("aiogram").setLevel("WARNING")
 logging.getLogger("aiohttp").setLevel("WARNING")

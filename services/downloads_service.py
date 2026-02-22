@@ -4,6 +4,7 @@ from database.database import append_path
 import PyPDF2
 import json
 from database.database_init import create_connect, terminate_connect
+import os
 
 
 async def download_file(message:Message) -> str:
@@ -13,7 +14,7 @@ async def download_file(message:Message) -> str:
     file = await message.bot.get_file(file_id)
     download_file = await message.bot.download_file(file.file_path)
     file_name = message.document.file_name
-    file_path_new = f"C:\\Users\\Lena\\Desktop\\github proects\\book_bot\\database\\users_books\\{message.from_user.id}\\{file_name}"
+    file_path_new = f"{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}\\database\\users_books\\{message.from_user.id}\\{file_name}"
     result_file = open(file_path_new, "wb")
     result_file.write(download_file.read())
     result_file.close()

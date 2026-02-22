@@ -16,7 +16,8 @@ def append_db(user_id) -> None:
                        "(user_id)"
                        "VALUES ({});".format(user_id))
         connect.commit()
-        os.chdir("C:\\Users\\Lena\\Desktop\\github proects\\book_bot\\database\\users_books")
+        path = os.path.dirname(os.path.abspath(__file__)) + "\\users_books"
+        os.chdir(path)
         os.mkdir(str(user_id))
     
     

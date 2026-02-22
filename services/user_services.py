@@ -82,23 +82,26 @@ async def down_click(book_id, book_path, callback:CallbackQuery):
             pass
     terminate_connect(connect)
 
+
 def get_path_book_then(callback:CallbackQuery):
     '''Получает путь к книге пользователя если она есть'''
     user_id = str(callback.from_user.id)
     book_name = str(callback.data).split("_")[-2]
-    book_path = f"C:\\Users\\Lena\\Desktop\\github proects\\book_bot\\database\\users_books\\{user_id}\\{book_name}"
-    os.chdir(f"C:\\Users\\Lena\\Desktop\\github proects\\book_bot\\database\\users_books\\{int(user_id)}")
-    if os.path.exists(f"C:\\Users\\Lena\\Desktop\\github proects\\book_bot\\database\\users_books\\{int(user_id)}\\{book_name}"):
+    book_path = f"{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}\\database\\users_books\\{user_id}\\{book_name}"
+    os.chdir(f"{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}\\database\\users_books\\{int(user_id)}")
+    if os.path.exists(book_path):
         return book_path
     else:
         return False
+
 
 def get_page(callback):
     '''Получает страницу книги из базы данных'''
     connect, cursor = create_connect()
     user_id = str(callback.from_user.id)
     book_name = str(callback.data).split("_")[-2]
-    book_path = f"C:/Users/Lena/Desktop/github proects/book_bot/database/users_books/{user_id}/{book_name}"
+    book_path = f"{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}\\database\\users_books\\{user_id}\\{book_name}"
+    book_path = book_path.replace("\\", "/")
     sql_select = """SELECT page FROM book WHERE user_id = %s AND path = %s"""
     cursor.execute(sql_select, (user_id, book_path))
     page = cursor.fetchone()[0]

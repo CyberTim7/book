@@ -1,4 +1,5 @@
 from database.database_init import create_connect, terminate_connect
+import os
 
 def delete_book_from_sql(callback):
     connect, cursor = create_connect()
@@ -6,7 +7,8 @@ def delete_book_from_sql(callback):
     user_id = callback.from_user.id
     lst = str(callback.data).split("_")
     book_name_json = lst[1]
-    path = f"C:/Users/Lena/Desktop/github proects/book_bot/database/users_books/{user_id}/{book_name_json}"
+    path = f"{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}\\database\\users_books\\{user_id}\\{book_name_json}"
+    path = path.replace("\\", "/")
     cursor.execute(sql_select, (user_id, path))
     connect.commit()
     terminate_connect(connect)

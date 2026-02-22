@@ -4,11 +4,12 @@ from services.database_services import get_user_acess
 from configs.config import load_config
 import time
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
-
-config = load_config(path="C:\\Users\\Lena\\Desktop\\github proects\\book_bot\\configs\\.env")
+path_config = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "\\configs\\.env"
+config = load_config(path_config)
 admin_lst = config.admin_lst.admins
 
 class Middleware_for_acess(BaseMiddleware):
@@ -47,7 +48,6 @@ class Middleware_for_acess(BaseMiddleware):
                 self.cashe.add(str(user_id))
                 
             elif len(self.cashe) >= self.cashe_limit:
-                logger.debug(f"обьем кэша:{len(self.cashe)}, элементы кэша: {str(self.cashe)}")
                 self.cashe.pop()
                 self.cashe.add(str(user_id))
                 

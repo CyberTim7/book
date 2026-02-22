@@ -6,7 +6,8 @@ logger = logging.getLogger(__name__)
 
 
 def checking_books(user_id, code):
-    os.chdir(f"C:\\Users\\Lena\\Desktop\\github proects\\book_bot\\database\\users_books\\{user_id}")
+    path = f"{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}\\database\\users_books\\{user_id}"
+    os.chdir(path)
     user_books = os.listdir()
     real_books = []
     for books in user_books:
@@ -24,7 +25,7 @@ def delete_user_book(callback):
     book_name_json = lst[1]
     index = lst[1].rfind(".")
     book_name_pdf = lst[1][:index + 1] + "pdf"
-    
-    os.chdir(f"C:\\Users\\Lena\\Desktop\\github proects\\book_bot\\database\\users_books\\{user_id}")
-    os.remove(f"C:\\Users\\Lena\\Desktop\\github proects\\book_bot\\database\\users_books\\{user_id}\\{book_name_json}")
-    os.remove(f"C:\\Users\\Lena\\Desktop\\github proects\\book_bot\\database\\users_books\\{user_id}\\{book_name_pdf}")
+    path = f"{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}\\database\\users_books\\{user_id}"
+    os.chdir(path)
+    os.remove(f"{path}\\{book_name_json}")
+    os.remove(f"{path}\\{book_name_pdf}")
