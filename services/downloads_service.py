@@ -6,6 +6,9 @@ import json
 from database.database_init import create_connect, terminate_connect
 import os
 from aiogram.types import Message, CallbackQuery
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 async def download_file(message:Message) -> str:
@@ -40,6 +43,7 @@ async def processed_file(message:Message):
             book_path = save_book(file_path, book)
             user_id = message.from_user.id
             append_path(user_id, book_path)
+            
             return book_path
         else:
             await message.answer(lexicon_RU["error_format"])

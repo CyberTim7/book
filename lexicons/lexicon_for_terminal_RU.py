@@ -6,8 +6,8 @@ lexicon_RU = {"start" : "Добро пожаловать в manual_control monit
     "user id: telegram user id, INTEGER\n"
     "user_name: любое имя для спокойствия администратора. STRING\n\n"
     "Используйте 'del' чтобы запретить 1 пользователю пользоваться ботом.\n"
-    "user id: telegram user id, INTEGER\n"
-    "Use 'change_language' to change the language (English, Russian)\n\n",
+    "user id: telegram user id, INTEGER\n\n"
+    "Используйте 'change_language' чтобы изменить язык. (English, Russian)\n\n",
     "change_lg" : "Введите значение: ",
     "changed_lg" : "Язык изменен.\nПерезапустите программу."
 

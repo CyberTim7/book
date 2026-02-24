@@ -96,15 +96,11 @@ def get_path_book_then(callback:CallbackQuery):
         return False
 
 
-def get_page(callback):
+def get_page(book_id):
     '''Получает страницу книги из базы данных'''
     connect, cursor = create_connect()
-    user_id = str(callback.from_user.id)
-    book_name = str(callback.data).split("_")[-2]
-    book_path = f"{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}\\database\\users_books\\{user_id}\\{book_name}"
-    book_path = book_path.replace("\\", "/")
-    sql_select = """SELECT page FROM book WHERE user_id = %s AND path = %s"""
-    cursor.execute(sql_select, (user_id, book_path))
+    sql_select = """SELECT page FROM book WHERE book_id = %s"""
+    cursor.execute(sql_select, (book_id,))
     page = cursor.fetchone()[0]
     terminate_connect(connect)
 

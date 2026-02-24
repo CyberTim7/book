@@ -32,7 +32,7 @@ def load_config(path:str) -> Config:
                   database=MySql(password=env("password"),
                                  admin=env("admin"),
                                  host=env("host"),
-                                 database=env("database")),
+                                 database="book_bot"),
                   admin_lst=Admin(admins=env("admins")))
 
 

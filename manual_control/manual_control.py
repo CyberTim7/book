@@ -32,77 +32,74 @@ print(lexicon["start"])
 while True:
     command = input("book_bot> ")
     while True:
-        
-        if command == "add":
-            sql_query = '''INSERT INTO user_acess
-               (user_id, full_name)
-               VALUES(%s, %s)'''
-            connect, cursor = create_connect()
-            
-            try:
-                user_id = int(input("user_id = "))
-            
-            except ValueError:
-                print("TypeError: value must be integer")
-                terminate_connect(connect)
-                continue
-            
-            full_name = input("user_name = ")
-            try:
-                cursor.execute(sql_query, (user_id, full_name[:-1]))
-                connect.commit()
-                print(lexicon["user_added"])
+            if command == "add":
+                sql_query = '''INSERT INTO user_access
+                (user_id, full_name)
+                VALUES(%s, %s)'''
+                connect, cursor = create_connect()
+                
+                try:
+                    user_id = int(input("user_id = "))
+                
+                except ValueError:
+                    print("TypeError: value must be integer")
+                    terminate_connect(connect)
+                    continue
+                
+                full_name = input("user_name = ").strip()
+                try:
+                    cursor.execute(sql_query, (user_id, full_name))
+                    connect.commit()
+                    print(lexicon["user_added"])
+                    break
+                except IntegrityError as e:
+                    print(f"DatabaseError: {e} ")
+                    break
+
+
+            elif command == "del":
+                sql_query = '''DELETE FROM user_access WHERE user_id = %s'''
+                connect, cursor = create_connect()
+                try:
+                    user_id = int(input("user_id = "))
+                
+                except ValueError:
+                    print("TypeError: value must be integer")
+                    terminate_connect(connect)
+                    continue
+                try:
+                    cursor.execute(sql_query, (user_id,))
+                except IntegrityError as e:
+                    print(f"DatabaseError: {e} ")
+                    break
+
+            elif command == "help":
+                print(lexicon["help"])
                 break
-            except IntegrityError as e:
-                print(f"DatabaseError: {e} ")
+            
+            elif command == "change_language":
+                lg = input(lexicon["change_lg"])
+                if lg == "Russian":
+                    with open(path_settings, "r+", encoding="utf-8") as file:
+                        data = json.load(file)
+                        data["language"] = "Russian"
+                        file.seek(0)
+                        json.dump(data, file)
+                    print(lexicon["changed_lg"])
+                
+                
+                elif lg == "English":
+                    with open(path_settings, "r+", encoding="utf-8") as file:
+                        data = json.load(file)
+                        data["language"] = "English"
+                        file.seek(0)
+                        json.dump(data, file)
+                    print(lexicon["changed_lg"])
+                
                 break
 
+                
 
-        elif command == "del":
-            sql_query = '''DELETE FROM user_acess WHERE user_id = %s'''
-            connect, cursor = create_connect()
-            try:
-                user_id = int(input("user_id = "))
-            
-            except ValueError:
-                print("TypeError: value must be integer")
-                terminate_connect(connect)
-                continue
-            try:
-                cursor.execute(sql_query, (user_id,))
-            except IntegrityError as e:
-                print(f"DatabaseError: {e} ")
+
+            else:
                 break
-
-        elif command == "help":
-            print(lexicon["help"])
-            break
-        
-        elif command == "change_language":
-            lg = input(lexicon["change_lg"])
-            if lg == "Russian":
-                with open(path_settings, "r+", encoding="utf-8") as file:
-                    data = json.load(file)
-                    data["language"] = "Russian"
-                    file.seek(0)
-                    json.dump(data, file)
-                print(lexicon["changed_lg"])
-            
-            
-            elif lg == "English":
-                with open(path_settings, "r+", encoding="utf-8") as file:
-                    data = json.load(file)
-                    data["language"] = "English"
-                    file.seek(0)
-                    json.dump(data, file)
-                print(lexicon["changed_lg"])
-            
-            break
-
-            
-
-
-        else:
-            break
-
-        

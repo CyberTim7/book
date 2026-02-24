@@ -89,10 +89,12 @@ async def book_list(message:Message, state:FSMContext):
 @user_router.callback_query(filter_code1())
 async def print_book(callback:CallbackQuery, state:FSMContext):
     await callback.answer(lexicon_RU["loading"])
-    book_path = get_path_book_then(callback)
-    if book_path:
-        page_real = get_page(callback)   
-        await open_file(book_path, callback, page=page_real)
+    logger.debug(f"book_id = {str(callback.data)}")
+    book_id = callback.data[:str(callback.data).rfind(".")]
+    if book_id:
+        page_real = get_page(book_id)   
+        book_path = get_book_path_from_book(book_id)
+        await open_file(book_path, book_id, callback, page=page_real)
     else:
         await callback.message.edit_text(lexicon_RU["no_file"])
 

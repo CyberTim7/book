@@ -1,0 +1,5 @@
+aiogram==3.23.0
+PyPDF2==3.0.1
+environs==14.5.0
+mysql-connector-python==9.5.0
+mysqlx-connector-python==9.6.0

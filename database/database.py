@@ -18,7 +18,10 @@ def append_db(user_id) -> None:
         connect.commit()
         path = os.path.dirname(os.path.abspath(__file__)) + "\\users_books"
         os.chdir(path)
-        os.mkdir(str(user_id))
+        try:
+            os.mkdir(str(user_id))
+        except FileExistsError:
+            pass
     
     
     except mysql.connector.errors.IntegrityError:
@@ -27,8 +30,17 @@ def append_db(user_id) -> None:
     
 
 def append_path(user_id, path):
-    connect, cursor = create_connect()
     '''Создает базовый словарь пользователя хотя бы с одной книгой'''
+    connect, cursor = create_connect()
+    try:
+        cursor.execute("INSERT INTO user"
+                       "(user_id)"
+                       "VALUES ({});".format(user_id))
+        connect.commit()
+    except mysql.connector.errors.IntegrityError:
+        pass
+    
+    
     index_end = path.rfind(".")
     index_st = path.rfind("\\") + 1
     book_name = path[index_st:index_end]
@@ -43,8 +55,8 @@ def append_path(user_id, path):
     try:
         cursor.execute(sql_query, (user_id, path))
         connect.commit()
-    except mysql.connector.errors.IntegrityError:
-        pass
+    except mysql.connector.errors.IntegrityError as e:
+        print(f"{e}")
     terminate_connect(connect)
     
     
