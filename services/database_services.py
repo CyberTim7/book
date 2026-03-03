@@ -1,16 +1,18 @@
 from database.database_init import create_connect, terminate_connect
 import os
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, TelegramObject
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 def delete_book_from_sql(callback:CallbackQuery):
     connect, cursor = create_connect()
-    sql_select = '''DELETE FROM book WHERE user_id = %s and path = %s'''
+    sql_select = '''DELETE FROM book WHERE book_id = %s'''
     user_id = callback.from_user.id
-    lst = str(callback.data).split("_")
-    book_name_json = lst[1]
-    path = f"{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}\\database\\users_books\\{user_id}\\{book_name_json}"
-    path = path.replace("\\", "/")
-    cursor.execute(sql_select, (user_id, path))
+    lst = str(callback.data).split(".")
+    book_id = lst[0]
+    cursor.execute(sql_select, (book_id,))
     connect.commit()
     terminate_connect(connect)
 
@@ -36,12 +38,14 @@ def get_book_path_from_book(book_id:int):
 def get_user_acess(event:TelegramObject):
     user_id = event.from_user.id
     connect, cursor = create_connect()
-    sql_query = '''SELECT 1 FROM user_acess WHERE user_id = %s LIMIT 1'''
+    
+    sql_query = '''SELECT 1 FROM user_access WHERE user_id = %s LIMIT 1'''
     cursor.execute(sql_query, (user_id,))
     res = cursor.fetchone()
     if res:
         return False
     else:
         return True
+    
 
     

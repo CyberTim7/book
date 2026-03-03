@@ -11,35 +11,46 @@ import mysql.connector
 def append_db(user_id) -> None:
     '''Эта функция добавляет пользователя в базу данных, если его там нет а также создает персональную папку для него'''
     connect, cursor = create_connect()
-    try:
-        cursor.execute("INSERT INTO user"
-                       "(user_id)"
-                       "VALUES ({});".format(user_id))
-        connect.commit()
-        path = os.path.dirname(os.path.abspath(__file__)) + "\\users_books"
-        os.chdir(path)
+    path_config = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "\\configs\\.env"
+    config = load_config(path_config)
+    admin_lst = config.admin_lst.admins
+    if not (str(user_id) in admin_lst):
         try:
-            os.mkdir(str(user_id))
-        except FileExistsError:
+            cursor.execute("INSERT INTO user"
+                        "(user_id)"
+                        "VALUES ({});".format(user_id))
+            connect.commit()
+            path = os.path.dirname(os.path.abspath(__file__)) + "\\users_books"
+            os.chdir(path)
+            try:
+                os.mkdir(str(user_id))
+            except FileExistsError:
+                pass     
+        except mysql.connector.errors.IntegrityError:
             pass
+        terminate_connect(connect)
+    else:
+        try:
+            cursor.execute("INSERT INTO user"
+                        "(user_id, role)"
+                        "VALUES ({}, 'ADMIN');".format(user_id))
+            connect.commit()
+            path = os.path.dirname(os.path.abspath(__file__)) + "\\users_books"
+            os.chdir(path)
+            try:
+                os.mkdir(str(user_id))
+            except FileExistsError:
+                pass     
+        except mysql.connector.errors.IntegrityError:
+            pass
+        terminate_connect(connect)
+
     
-    
-    except mysql.connector.errors.IntegrityError:
-        pass
-    terminate_connect(connect)
     
 
 def append_path(user_id, path):
     '''Создает базовый словарь пользователя хотя бы с одной книгой'''
     connect, cursor = create_connect()
-    try:
-        cursor.execute("INSERT INTO user"
-                       "(user_id)"
-                       "VALUES ({});".format(user_id))
-        connect.commit()
-    except mysql.connector.errors.IntegrityError:
-        pass
-    
     
     index_end = path.rfind(".")
     index_st = path.rfind("\\") + 1

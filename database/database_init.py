@@ -2,9 +2,17 @@ import mysql.connector
 from configs.config import load_config
 import os
 import logging
+import traceback
+import mysql.connector
 
 
 class NoFoundBook(BaseException):
+    pass
+
+class NoFoundUser(BaseException):
+    pass
+
+class InvalidID(BaseException):
     pass
 
 logger = logging.getLogger(__name__)
@@ -27,15 +35,15 @@ def terminate_connect(connect):
 def _full_checking_database():
     connect, cursor = create_connect()
     cursor.execute("SELECT user_id FROM user")
-    users_ids = set((cursor.fetchall()))
+    users_ids = set(*cursor.fetchall())
     logger.debug(f"id пользователей: {users_ids}")
     ids_in_drct = set(map(lambda x: int(x), os.listdir(f"{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}\\database\\users_books"))) 
     logger.debug(f"id пользователей в директории: {ids_in_drct}")
     if ids_in_drct == users_ids:
-        logger.debug("OK BY user")
+        pass
     else:
-        logger.debug("Пользователь не найден")
-        
+        msg = "Некоторые пользователи не найдены в базе данных. Выполните диагностику."
+        raise NoFoundUser(msg)
 
     cursor.execute("SELECT user_id, path FROM book")
     user_id_and_books = cursor.fetchall()
@@ -52,6 +60,33 @@ def _full_checking_database():
             raise NoFoundBook(msg)
 
         
+def _add_admins():
+    connect, cursor = create_connect()
+    admin_lst = config.admin_lst.admins[1:-1]
+    if len(admin_lst) == 1:
+        logger.warning("Администатор программы не назначен. Назначьте администратора или будет потеряно управление.")
+    else:
+        admin_lst = set(admin_lst.split(","))
+        for admin_id in admin_lst:
+            try:
+                int(admin_id)
+            except ValueError:
+                msg = 'ADMIN ID должно быть целое число или None. Проверьте поле ADMIN ID.'
+                raise InvalidID(msg)
+
+            try:
+                sql_query = '''INSERT INTO user (user_id, role) VALUES(%s, "ADMIN")'''
+                cursor.execute(sql_query, (int(admin_id),))
+                connect.commit()
+            except mysql.connector.errors.IntegrityError:
+                pass
+            
+            
+            try:
+                os.mkdir(f"{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}\\database\\users_books\\{admin_id}")
+            except FileExistsError:
+                pass
+    terminate_connect(connect)
 
 def init_database():
     
@@ -65,6 +100,13 @@ def init_database():
     cursor.execute("CREATE TABLE IF NOT EXISTS user_access (user_id BIGINT NOT NULL,"
                                                            "full_name VARCHAR(100))")
     connect.commit()
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    try:
+        os.mkdir("users_books")
+    except FileExistsError:
+        pass
+    
     _full_checking_database()
+    _add_admins()
     terminate_connect(connect)
 

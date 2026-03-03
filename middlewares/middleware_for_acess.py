@@ -10,7 +10,8 @@ logger = logging.getLogger(__name__)
 
 path_config = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "\\configs\\.env"
 config = load_config(path_config)
-admin_lst = config.admin_lst.admins
+admin_lst = config.admin_lst.admins[1:-1]
+admin_lst = set(admin_lst.split(","))
 
 class Middleware_for_acess(BaseMiddleware):
     
@@ -54,5 +55,13 @@ class Middleware_for_acess(BaseMiddleware):
             else:
                 self.cashe = set()
                 self.cashe.add(str(user_id))
+            
+            
+        os.chdir(f"{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}\\database\\users_books")
+        try:
+            os.mkdir(str(user_id))
+        except FileExistsError:
+            pass
+        
         
         result = await handler(event, data)
